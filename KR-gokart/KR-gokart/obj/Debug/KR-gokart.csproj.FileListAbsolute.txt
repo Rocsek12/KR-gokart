@@ -1,0 +1,7 @@
+C:\Users\KisjuhaszRoland\source\repos\KR-gokart\KR-gokart\bin\Debug\KR-gokart.exe.config
+C:\Users\KisjuhaszRoland\source\repos\KR-gokart\KR-gokart\bin\Debug\KR-gokart.exe
+C:\Users\KisjuhaszRoland\source\repos\KR-gokart\KR-gokart\bin\Debug\KR-gokart.pdb
+C:\Users\KisjuhaszRoland\source\repos\KR-gokart\KR-gokart\obj\Debug\KR-gokart.csproj.AssemblyReference.cache
+C:\Users\KisjuhaszRoland\source\repos\KR-gokart\KR-gokart\obj\Debug\KR-gokart.csproj.CoreCompileInputs.cache
+C:\Users\KisjuhaszRoland\source\repos\KR-gokart\KR-gokart\obj\Debug\KR-gokart.exe
+C:\Users\KisjuhaszRoland\source\repos\KR-gokart\KR-gokart\obj\Debug\KR-gokart.pdb
