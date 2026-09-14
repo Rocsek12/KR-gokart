@@ -1,6 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\KR-gokart",
+    "\\KR-gokart\\KR-gokart"
   ],
+  "SelectedNode": "\\KR-gokart\\KR-gokart\\Program.cs",
   "PreviewInSolutionExplorer": false
 }
