@@ -50,8 +50,8 @@ namespace KR_gokart
 
         public override string ToString()
         {
-            return $"{Vezeteknev} {Keresztnev} | Szül.: {SzuletesiIdo:yyyy.MM.dd.} | " +
-                   $"Elmúlt 18 éves: {ElmultTizennyolc} | Azonosító: {Azonosito} | Email: {Email}";
+            return $"{Vezeteknev} {Keresztnev} | {SzuletesiIdo:yyyy.MM.dd.} | " +
+                   $"{ElmultTizennyolc} |{Azonosito} |{Email}";
         }
     }
 
@@ -247,7 +247,7 @@ namespace KR_gokart
             DateTime ma = DateTime.Today;
             int napokSzama = DateTime.DaysInMonth(ma.Year, ma.Month) - ma.Day + 1;
 
-            int savDarab = rnd.Next(3, 7); // 3 vagy 4 foglalt sáv
+            int savDarab = rnd.Next(3, 7); // 3 vagy 7 foglalt sáv
             var hasznaltSavok = new HashSet<(DateTime, int)>();
             var kevertVersenyzok = versenyzok.OrderBy(v => rnd.Next()).ToList();
             int index = 0;
