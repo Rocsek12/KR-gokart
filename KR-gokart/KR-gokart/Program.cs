@@ -1,16 +1,4 @@
-﻿/*
- * ============================================================
- *  Projekt neve : Gokart időpontfoglaló - Egyéni kisprojekt
- *  Készítette   : KR
- *  Kezdő dátum  : 2026.09.07.
- * ============================================================
- *  A program egy fiktív gokartpálya időpontfoglalási
- *  rendszerét valósítja meg objektumorientált módon,
- *  DateTime típus használatával.
- * ============================================================
- */
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -19,9 +7,7 @@ using System.Text;
 
 namespace KR_gokart
 {
-    // ------------------------------------------------------------
     //  Egy versenyzőt leíró osztály
-    // ------------------------------------------------------------
     class Versenyzo
     {
         public string Vezeteknev { get; set; }
@@ -131,6 +117,7 @@ namespace KR_gokart
             Console.WriteLine("============================================================\n");
 
             VersenyzokGeneralasa();
+            AlapFoglalasokGeneralasa();   // 3-4 alapból foglalt időpont
 
             bool kilep = false;
             while (!kilep)
@@ -250,6 +237,50 @@ namespace KR_gokart
             Console.WriteLine($"{darabszam} db versenyző generálva.");
         }
 
+        // ------------------------------------------------------------
+        //  3-4 előre foglalt időpont generálása (a mai naptól hónap végéig)
+        //  Minden versenyző csak egy sávban szerepel, így a manuális
+        //  átállítás (ami a korábbi foglalást törli) konzisztens marad.
+        // ------------------------------------------------------------
+        static void AlapFoglalasokGeneralasa()
+        {
+            DateTime ma = DateTime.Today;
+            int napokSzama = DateTime.DaysInMonth(ma.Year, ma.Month) - ma.Day + 1;
+
+            int savDarab = rnd.Next(3, 7); // 3 vagy 4 foglalt sáv
+            var hasznaltSavok = new HashSet<(DateTime, int)>();
+            var kevertVersenyzok = versenyzok.OrderBy(v => rnd.Next()).ToList();
+            int index = 0;
+
+            for (int i = 0; i < savDarab && index < kevertVersenyzok.Count; i++)
+            {
+                DateTime nap;
+                int ora;
+
+                // Olyan (nap, óra) párt keresünk, ami még nem foglalt
+                do
+                {
+                    nap = ma.AddDays(rnd.Next(napokSzama));
+                    ora = rnd.Next(NyitasOra, ZarasOra);
+                } while (!hasznaltSavok.Add((nap, ora)));
+
+                // Létszám: MinFoPalyan-MaxFoPalyan között, de legfeljebb ahány versenyző még szabad
+                int fo = rnd.Next(MinFoPalyan, MaxFoPalyan + 1);
+                fo = Math.Min(fo, kevertVersenyzok.Count - index);
+
+                for (int j = 0; j < fo; j++)
+                {
+                    foglalasok.Add(new Foglalas
+                    {
+                        VersenyzoAzonosito = kevertVersenyzok[index++].Azonosito,
+                        Datum = nap.Date,
+                        OraKezdet = ora
+                    });
+                }
+            }
+
+            Console.WriteLine($"{hasznaltSavok.Count} db alapból foglalt időpont létrehozva.");
+        }
 
         //  Versenyzők listázása
 
@@ -352,9 +383,9 @@ namespace KR_gokart
             int honapUtolsoNapja = DateTime.DaysInMonth(ma.Year, ma.Month);
             DateTime honapVege = new DateTime(ma.Year, ma.Month, honapUtolsoNapja);
 
-            Console.Write($"Add meg a dátumot (éééé.hh.nn., {ma:yyyy.MM.dd.} és {honapVege:yyyy.MM.dd.} között): ");
+            Console.Write($"Add meg a dátumot (hh.nn., {ma:MM.dd.} és {honapVege:MM.dd.} között): ");
             string datumSzoveg = Console.ReadLine()?.Trim();
-            bool datumOk = DateTime.TryParseExact(datumSzoveg, "yyyy.MM.dd.",
+            bool datumOk = DateTime.TryParseExact(datumSzoveg, "MM.dd.",
                     CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime datum)
                 || DateTime.TryParse(datumSzoveg, out datum);
 
