@@ -94,6 +94,15 @@ namespace KR_gokart
         const int MinOraFoglalas = 1;
         const int MaxOraFoglalas = 2;
 
+        // ---- Versenyzők táblázatos listázásának oszlopszélességei ----
+        const int SorszamSzelesseg = 6;
+        const int VezeteknevSzelesseg = 15;
+        const int KeresztnevSzelesseg = 15;
+        const int SzuletesiIdoSzelesseg = 13;
+        const int ElmultTizennyolcSzelesseg = 10;
+        const int AzonositoSzelesseg = 32;
+        const int EmailSzelesseg = 35;
+
         static List<Versenyzo> versenyzok = new List<Versenyzo>();
         static List<Foglalas> foglalasok = new List<Foglalas>();
         static Random rnd = new Random();
@@ -282,15 +291,56 @@ namespace KR_gokart
             Console.WriteLine($"{hasznaltSavok.Count} db alapból foglalt időpont létrehozva.");
         }
 
-        //  Versenyzők listázása
+        // ------------------------------------------------------------
+        //  Egy szöveget adott szélességre balra igazít (kiegészítve
+        //  szóközökkel, vagy levágva, ha túl hosszú)
+        // ------------------------------------------------------------
+        static string Balra(string szoveg, int szelesseg)
+        {
+            if (szoveg.Length >= szelesseg)
+                return szoveg.Substring(0, szelesseg);
 
+            return szoveg.PadRight(szelesseg);
+        }
+
+        // ------------------------------------------------------------
+        //  Versenyzők listázása táblázatos, fix szélességű,
+        //  balra igazított oszlopokkal
+        // ------------------------------------------------------------
         static void VersenyzokListazasa()
         {
             Console.WriteLine("\n------------------- VERSENYZŐK LISTÁJA -------------------");
+
+            // ---- Fejléc sor ----
+            Console.WriteLine(
+                Balra("Sorsz.", SorszamSzelesseg) + "| " +
+                Balra("Vezetéknév", VezeteknevSzelesseg) + "| " +
+                Balra("Keresztnév", KeresztnevSzelesseg) + "| " +
+                Balra("Szül. idő", SzuletesiIdoSzelesseg) + "| " +
+                Balra("Elmúlt 18", ElmultTizennyolcSzelesseg) + "| " +
+                Balra("Azonosító", AzonositoSzelesseg) + "| " +
+                Balra("Email", EmailSzelesseg));
+
+            // ---- Elválasztó vonal ----
+            int teljesSzelesseg = SorszamSzelesseg + VezeteknevSzelesseg + KeresztnevSzelesseg +
+                                   SzuletesiIdoSzelesseg + ElmultTizennyolcSzelesseg +
+                                   AzonositoSzelesseg + EmailSzelesseg + 6 * 2; // elválasztók ("| ")
+            Console.WriteLine(new string('-', teljesSzelesseg));
+
+            // ---- Adatsorok ----
             for (int i = 0; i < versenyzok.Count; i++)
             {
-                Console.WriteLine($"{i + 1,4}. {versenyzok[i]}");
+                Versenyzo v = versenyzok[i];
+                Console.WriteLine(
+                    Balra($"{i + 1}.", SorszamSzelesseg) + "| " +
+                    Balra(v.Vezeteknev, VezeteknevSzelesseg) + "| " +
+                    Balra(v.Keresztnev, KeresztnevSzelesseg) + "| " +
+                    Balra($"{v.SzuletesiIdo:yyyy.MM.dd.}", SzuletesiIdoSzelesseg) + "| " +
+                    Balra(v.ElmultTizennyolc.ToString(), ElmultTizennyolcSzelesseg) + "| " +
+                    Balra(v.Azonosito, AzonositoSzelesseg) + "| " +
+                    Balra(v.Email, EmailSzelesseg));
             }
+
             Console.WriteLine($"Összesen: {versenyzok.Count} versenyző.");
         }
 
@@ -361,11 +411,60 @@ namespace KR_gokart
         }
 
         // ------------------------------------------------------------
+        //  Meglévő foglalások listázása (pl. a random generálás által
+        //  már beállított foglalások), dátum/óra szerint rendezve
+        // ------------------------------------------------------------
+        const int FoglalasSorszamSzelesseg = 6;
+        const int FoglalasDatumSzelesseg = 13;
+        const int FoglalasOraSzelesseg = 13;
+        const int FoglalasAzonositoSzelesseg = 32;
+
+        static void FoglalasokListazasa()
+        {
+            Console.WriteLine("\n----------------- MÁR MEGLÉVŐ FOGLALÁSOK -----------------");
+
+            if (foglalasok.Count == 0)
+            {
+                Console.WriteLine("Jelenleg nincs egyetlen foglalás sem.");
+                return;
+            }
+
+            // ---- Fejléc sor ----
+            Console.WriteLine(
+                Balra("Sorsz.", FoglalasSorszamSzelesseg) + "| " +
+                Balra("Dátum", FoglalasDatumSzelesseg) + "| " +
+                Balra("Idősáv", FoglalasOraSzelesseg) + "| " +
+                Balra("Versenyző azonosító", FoglalasAzonositoSzelesseg));
+
+            int teljesSzelesseg = FoglalasSorszamSzelesseg + FoglalasDatumSzelesseg +
+                                   FoglalasOraSzelesseg + FoglalasAzonositoSzelesseg + 3 * 2;
+            Console.WriteLine(new string('-', teljesSzelesseg));
+
+            // ---- Adatsorok: dátum, majd óra szerint rendezve ----
+            var rendezett = foglalasok.OrderBy(f => f.Datum).ThenBy(f => f.OraKezdet).ToList();
+            for (int i = 0; i < rendezett.Count; i++)
+            {
+                Foglalas f = rendezett[i];
+                Console.WriteLine(
+                    Balra($"{i + 1}.", FoglalasSorszamSzelesseg) + "| " +
+                    Balra($"{f.Datum:yyyy.MM.dd.}", FoglalasDatumSzelesseg) + "| " +
+                    Balra($"{f.OraKezdet:00}:00-{f.OraKezdet + 1:00}:00", FoglalasOraSzelesseg) + "| " +
+                    Balra(f.VersenyzoAzonosito, FoglalasAzonositoSzelesseg));
+            }
+
+            Console.WriteLine($"Összesen: {rendezett.Count} foglalás.");
+        }
+
+        // ------------------------------------------------------------
         //  Manuális foglalás be-/átállítása versenyző-azonosító alapján
         // ------------------------------------------------------------
         static void ManualisFoglalasBeallitas()
         {
             VersenyzokListazasa();
+
+            // Meglévő (pl. random generálás által beállított) foglalások listázása,
+            // még mielőtt bekérnénk a versenyző-azonosítót
+            FoglalasokListazasa();
 
             Console.Write("\nAdd meg a versenyző-azonosítót (pl. GO-KovacsDenes-19741204): ");
             string azonosito = Console.ReadLine()?.Trim();
@@ -378,6 +477,9 @@ namespace KR_gokart
             }
 
             Console.WriteLine($"Kiválasztott versenyző: {kivalasztott}");
+
+            // Időpont-táblázat megjelenítése, hogy látszódjon mi szabad/foglalt
+            IdoszalagMegjelenites();
 
             DateTime ma = DateTime.Today;
             int honapUtolsoNapja = DateTime.DaysInMonth(ma.Year, ma.Month);
